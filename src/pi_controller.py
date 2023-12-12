@@ -38,7 +38,6 @@ def plot_data(**kwargs):
     # Time points
     T = length_u - 1
     t = np.linspace(0, T, T + 1)
-    time = np.arange(T)
 
     # Plot inputs
     fig, ax = plt.subplots()
@@ -122,25 +121,10 @@ def find_controller_parameters(
     return sorted_results
 
 
-if __name__ == "__main__":
-    uc, uh, up, Vc, Tco, Thi = load_data()
-
-    # Setpoints
-    r_Vc = 200
-    r_Tco = 40
-    r_Thi = 50
-    Ts = 1
-
-    plot_data(uc=uc)
-    controller_init_values = initialize_controller_values(
-        uc, uh, up, Vc, Tco, Thi, r_Vc, r_Tco, r_Thi
-    )
-    sorted_results = find_controller_parameters(mini, controller_init_values)
-
+def log_results(sorted_results):
     for i, inner_list in enumerate(sorted_results):
         print(i, "sorted list:", inner_list, "\n")
 
-    # Print the answer
     uc_best = sorted_results[0][0]
     uh_best = sorted_results[1][0]
     up_best = sorted_results[2][0]
@@ -162,5 +146,22 @@ if __name__ == "__main__":
         f"and integration time(Ti): {up_best.Ti:.2f}"
         f"using the {up_best.method} method"
     )
+
+
+if __name__ == "__main__":
+    # Setpoints
+    r_Vc = 200
+    r_Tco = 40
+    r_Thi = 50
+    Ts = 1
+
+    uc, uh, up, Vc, Tco, Thi = load_data()
+    plot_data(uc=uc, uh=uh, up=up)
+    controller_init_values = initialize_controller_values(
+        uc, uh, up, Vc, Tco, Thi, r_Vc, r_Tco, r_Thi
+    )
+    sorted_results = find_controller_parameters(mini, controller_init_values)
+
+    log_results(sorted_results)
 
     save_list_to_file(sorted_results)
