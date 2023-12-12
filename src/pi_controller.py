@@ -2,6 +2,7 @@ import numpy as np
 import random
 from scipy import optimize
 import matplotlib.pyplot as plt
+from dataclasses import dataclass
 
 
 def load_data(start=399):
@@ -47,6 +48,14 @@ def plot_data(**kwargs):
     plt.show()
 
 
+@dataclass
+class ControllerResult:
+    fitness: float
+    Kc: float
+    Ti: float
+    method: str
+
+
 def mini(u, y, r, initials):
     # Minimizer
     def u_error(x):
@@ -76,14 +85,16 @@ def mini(u, y, r, initials):
         for method in methods:
             try:
                 a = optimize.minimize(u_error, initial, method=method)
-                result = (a.fun, a.x, method)  # make an object for saving results
+                result = ControllerResult(
+                    fitness=a.fun, Kc=a.x[0], Ti=a.x[1], method=method
+                )
                 results.append(result)
             except Exception as e:
                 print(f"Raise error: {e}")
     return results
 
 
-def save_list_to_file(sorted_outer_list: list[list]):
+def save_list_to_file(sorted_outer_list):
     with open("data\solution_list.txt", "w") as file:
         for item in sorted_outer_list:
             file.write(str(item) + "\n")
@@ -104,7 +115,7 @@ def initialize_controller_values(uc, uh, up, Vc, Tco, Thi, r_Vc, r_Tco, r_Thi, s
 
 def find_controller_parameters(mini, controller_init_values):
     results = [mini(*controller) for controller in controller_init_values]
-    sorted_results = [sorted(result, key=lambda x: x[0]) for result in results]
+    sorted_results = [sorted(result, key=lambda x: x.fitness) for result in results]
     return sorted_results
 
 
@@ -130,23 +141,23 @@ if __name__ == "__main__":
     uc_best = sorted_results[0][0]
     uh_best = sorted_results[1][0]
     up_best = sorted_results[2][0]
-    uc_fit, (uc_Kc, uc_Ti), _ = uc_best
-    uh_fit, (uh_Kc, uh_Ti), _ = uh_best
-    up_fit, (up_Kc, up_Ti), _ = up_best
     print(
-        f"uc controller's fitness is {uc_fit:.2e}, "
-        f"using gain(Kc): {uc_Kc:.2f}, "
-        f"and integration time(Ti): {uc_Ti:.2f}"
+        f"uc controller's fitness is {uc_best.fitness:.2e}, "
+        f"using gain(Kc): {uc_best.Kc:.2f}, "
+        f"and integration time(Ti): {uc_best.Ti:.2f}"
+        f"using the {uc_best.method} method"
     )
     print(
-        f"uh controller's fitness is {uh_fit:.2e}, "
-        f"using gain(Kc): {uh_Kc:.2f}, "
-        f"and integration time(Ti): {uh_Ti:.2f}"
+        f"uh controller's fitness is {uh_best.fitness:.2e}, "
+        f"using gain(Kc): {uh_best.Kc:.2f}, "
+        f"and integration time(Ti): {uh_best.Ti:.2f}"
+        f"using the {uh_best.method} method"
     )
     print(
-        f"up controller's fitness is {up_fit:.2e}, "
-        f"using gain(Kc): {up_Kc:.2f}, "
-        f"and integration time(Ti): {up_Ti:.2f}"
+        f"up controller's fitness is {up_best.fitness:.2e}, "
+        f"using gain(Kc): {up_best.Kc:.2f}, "
+        f"and integration time(Ti): {up_best.Ti:.2f}"
+        f"using the {up_best.method} method"
     )
 
     save_list_to_file(sorted_results)
