@@ -63,7 +63,7 @@ pip install -r requirements.txt
 
 On Windows
 ```
-python3 -m venv .venv
+python -m venv .venv
 .venv\Scripts\activate
 pip install -r requirements.txt
 ```
