@@ -3,6 +3,7 @@ import random
 from scipy import optimize
 import matplotlib.pyplot as plt
 from dataclasses import dataclass
+from typing import List
 
 
 def load_data(start=399):
@@ -56,7 +57,7 @@ class ControllerResult:
     method: str
 
 
-def mini(u, y, r, initials):
+def mini(u, y, r, initials) -> List[ControllerResult]:
     # Minimizer
     def u_error(x):
         Kc, Ti = x
@@ -94,7 +95,7 @@ def mini(u, y, r, initials):
     return results
 
 
-def save_list_to_file(sorted_outer_list):
+def save_list_to_file(sorted_outer_list: List[List[ControllerResult]]):
     with open("data\solution_list.txt", "w") as file:
         for item in sorted_outer_list:
             file.write(str(item) + "\n")
@@ -113,7 +114,9 @@ def initialize_controller_values(uc, uh, up, Vc, Tco, Thi, r_Vc, r_Tco, r_Thi, s
     return controllers
 
 
-def find_controller_parameters(mini, controller_init_values):
+def find_controller_parameters(
+    mini, controller_init_values
+) -> List[List[ControllerResult]]:
     results = [mini(*controller) for controller in controller_init_values]
     sorted_results = [sorted(result, key=lambda x: x.fitness) for result in results]
     return sorted_results
