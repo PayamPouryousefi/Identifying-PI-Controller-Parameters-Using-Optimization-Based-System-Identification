@@ -75,7 +75,7 @@ I was able to use miniconda 23.9.0 to run the code as well.
 The simulation is implemented in Python. To run:
 
 ```
-python src\simulate_agents.py
+python src\pi_controller.py
 ```
 
 The script loads parameters, integrates the equations, and plots the results. See the code for analysis details.
