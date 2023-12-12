@@ -72,7 +72,7 @@ I was able to use miniconda 23.9.0 to run the code as well.
 
 **Usage:**
 
-The simulation is implemented in Python. To run:
+The data analysis is implemented in Python. To run:
 
 ```
 python src\pi_controller.py
