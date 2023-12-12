@@ -39,12 +39,21 @@ def plot_data(**kwargs):
     T = length_u - 1
     t = np.linspace(0, T, T + 1)
 
-    # Plot inputs
-    fig, ax = plt.subplots()
+    # Create individual subplots for each variable
+    fig, axes = plt.subplots(nrows=no_input, ncols=1, figsize=(8, 3 * no_input))
+
     for i, (var_name, var_value) in enumerate(kwargs.items()):
+        # If only one variable, axes is a single subplot
+        if no_input == 1:
+            ax = axes
+        else:
+            ax = axes[i]
+
         ax.plot(t, var_value, style[i], label=var_name)
-    ax.set_xlabel("Time")
-    ax.legend()
+        ax.set_xlabel("Time")
+        ax.legend()
+
+    plt.tight_layout()
     plt.show()
 
 
